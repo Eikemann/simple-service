@@ -3,7 +3,7 @@ package com.company.simpleservice.services.impl;
 import com.company.simpleservice.dto.request.Order.CreateOrderRequest;
 import com.company.simpleservice.dto.request.Order.UpdateOrderRequest;
 import com.company.simpleservice.dto.response.OrderResponse;
-import com.company.simpleservice.exceptions.SubjectNotFoundException;
+import com.company.simpleservice.exceptions.ResourceNotFoundException;
 import com.company.simpleservice.mapper.OrderMapper;
 import com.company.simpleservice.models.Hotel;
 import com.company.simpleservice.models.Order;
@@ -30,43 +30,43 @@ class OrderServiceImpl implements OrderService {
 
     @Override
     public void create(CreateOrderRequest request) {
-        Hotel hotel = hotelRepository.findById(request.getHotelId())
-                .orElseThrow(() -> new SubjectNotFoundException(request.getHotelId()));
-        Room room = roomRepository.findById(request.getRoomId())
-                .orElseThrow(() -> new SubjectNotFoundException(request.getRoomId()));
+        Hotel hotel = hotelRepository.findById(request.hotelId())
+                .orElseThrow(() -> new ResourceNotFoundException(request.hotelId()));
+        Room room = roomRepository.findById(request.roomId())
+                .orElseThrow(() -> new ResourceNotFoundException(request.roomId()));
 
         if (!room.getHotel().getId().equals(hotel.getId())) {
             throw new IllegalArgumentException("Room does not belong to the specified hotel");
         }
-        if (!request.getCheckOutDate().isAfter(request.getCheckInDate())) {
+        if (!request.checkOutDate().isAfter(request.checkInDate())) {
             throw new IllegalArgumentException("checkOutDate must be after checkInDate");
         }
 
         Order order = Order.builder()
                 .hotel(hotel)
                 .room(room)
-                .guestName(request.getGuestName())
-                .guestEmail(request.getGuestEmail())
-                .checkInDate(request.getCheckInDate())
-                .checkOutDate(request.getCheckOutDate())
-                .totalAmount(request.getTotalAmount())
-                .orderStatus(request.getOrderStatus())
+                .guestName(request.guestName())
+                .guestEmail(request.guestEmail())
+                .checkInDate(request.checkInDate())
+                .checkOutDate(request.checkOutDate())
+                .totalAmount(request.totalAmount())
+                .orderStatus(request.orderStatus())
                 .build();
         orderRepository.save(order);
     }
 
     @Override
     public void update(Long id, UpdateOrderRequest request) {
-        if (!request.getCheckOutDate().isAfter(request.getCheckInDate())) {
+        if (!request.checkOutDate().isAfter(request.checkInDate())) {
             throw new IllegalArgumentException("checkOutDate must be after checkInDate");
         }
         Order order = getOrderOrThrow(id);
-        order.setGuestName(request.getGuestName());
-        order.setGuestEmail(request.getGuestEmail());
-        order.setCheckInDate(request.getCheckInDate());
-        order.setCheckOutDate(request.getCheckOutDate());
-        order.setTotalAmount(request.getTotalAmount());
-        order.setOrderStatus(request.getOrderStatus());
+        order.setGuestName(request.guestName());
+        order.setGuestEmail(request.guestEmail());
+        order.setCheckInDate(request.checkInDate());
+        order.setCheckOutDate(request.checkOutDate());
+        order.setTotalAmount(request.totalAmount());
+        order.setOrderStatus(request.orderStatus());
         orderRepository.save(order);
     }
 
@@ -104,6 +104,6 @@ class OrderServiceImpl implements OrderService {
 
     private Order getOrderOrThrow(Long id) {
         return orderRepository.findById(id)
-                .orElseThrow(() -> new SubjectNotFoundException(id));
+                .orElseThrow(() -> new ResourceNotFoundException(id));
     }
 }

@@ -3,7 +3,7 @@ package com.company.simpleservice.services.impl;
 import com.company.simpleservice.dto.request.Review.CreateReviewRequest;
 import com.company.simpleservice.dto.request.Review.UpdateReviewRequest;
 import com.company.simpleservice.dto.response.ReviewResponse;
-import com.company.simpleservice.exceptions.SubjectNotFoundException;
+import com.company.simpleservice.exceptions.ResourceNotFoundException;
 import com.company.simpleservice.mapper.ReviewMapper;
 import com.company.simpleservice.models.Hotel;
 import com.company.simpleservice.models.Review;
@@ -27,14 +27,14 @@ class ReviewServiceImpl implements ReviewService {
 
     @Override
     public void create(CreateReviewRequest request) {
-        Hotel hotel = hotelRepository.findById(request.getHotelId())
-                .orElseThrow(() -> new SubjectNotFoundException(request.getHotelId()));
+        Hotel hotel = hotelRepository.findById(request.hotelId())
+                .orElseThrow(() -> new ResourceNotFoundException(request.hotelId()));
         Review review = Review.builder()
                 .hotel(hotel)
-                .rating(request.getRating())
-                .title(request.getTitle())
-                .comment(request.getComment())
-                .reviewerName(request.getReviewerName())
+                .rating(request.rating())
+                .title(request.title())
+                .comment(request.comment())
+                .reviewerName(request.reviewerName())
                 .build();
         reviewRepository.save(review);
     }
@@ -42,10 +42,10 @@ class ReviewServiceImpl implements ReviewService {
     @Override
     public void update(Long id, UpdateReviewRequest request) {
         Review review = getReviewOrThrow(id);
-        review.setRating(request.getRating());
-        review.setTitle(request.getTitle());
-        review.setComment(request.getComment());
-        review.setReviewerName(request.getReviewerName());
+        review.setRating(request.rating());
+        review.setTitle(request.title());
+        review.setComment(request.comment());
+        review.setReviewerName(request.reviewerName());
         reviewRepository.save(review);
     }
 
@@ -76,6 +76,6 @@ class ReviewServiceImpl implements ReviewService {
 
     private Review getReviewOrThrow(Long id) {
         return reviewRepository.findById(id)
-                .orElseThrow(() -> new SubjectNotFoundException(id));
+                .orElseThrow(() -> new ResourceNotFoundException(id));
     }
 }

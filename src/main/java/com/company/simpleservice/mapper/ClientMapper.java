@@ -6,15 +6,14 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class ClientMapper {
-
     public ClientResponse toResponse(Client client) {
-        return ClientResponse.builder()
-                .id(client.getId())
-                .fullName(client.getFullName())
-                .gender(client.getGender())
-                .status(client.getClientStatus())
-                .createdAt(client.getCreatedAt())
-                .updatedAt(client.getUpdatedAt())
-                .build();
+        return new ClientResponse(
+                client.getId(),
+                client.getFullName(),
+                client.getGender(),
+                client.getClientStatus(),
+                client.getCreatedAt(),
+                client.getUpdatedAt()
+        );
     }
 }

@@ -3,7 +3,7 @@ package com.company.simpleservice.services.impl;
 import com.company.simpleservice.dto.request.Client.CreateClientRequest;
 import com.company.simpleservice.dto.request.Client.UpdateClientRequest;
 import com.company.simpleservice.dto.response.ClientResponse;
-import com.company.simpleservice.exceptions.SubjectNotFoundException;
+import com.company.simpleservice.exceptions.ResourceNotFoundException;
 import com.company.simpleservice.mapper.ClientMapper;
 import com.company.simpleservice.models.Client;
 import com.company.simpleservice.models.ClientStatus;
@@ -27,11 +27,11 @@ public class ClientServiceImpl implements ClientService {
     @Override
     @Transactional
     public ClientResponse create(CreateClientRequest request) {
-        log.debug("Creating client: {}", request.getFullName());
+        log.debug("Creating client: {}", request.fullName());
 
         Client client = Client.builder()
-                .fullName(request.getFullName())
-                .gender(request.getGender())
+                .fullName(request.fullName())
+                .gender(request.gender())
                 .clientStatus(ClientStatus.ACTIVE)
                 .build();
 
@@ -63,14 +63,14 @@ public class ClientServiceImpl implements ClientService {
         log.debug("Updating client id={}", id);
         Client client = getClientOrThrow(id);
 
-        if (request.getFullName() != null) {
-            client.setFullName(request.getFullName());
+        if (request.fullName() != null) {
+            client.setFullName(request.fullName());
         }
-        if (request.getGender() != null) {
-            client.setGender(request.getGender());
+        if (request.gender() != null) {
+            client.setGender(request.gender());
         }
-        if (request.getStatus() != null) {
-            client.setClientStatus(request.getStatus());
+        if (request.status() != null) {
+            client.setClientStatus(request.status());
         }
 
         Client updated = clientRepository.save(client);
@@ -89,6 +89,6 @@ public class ClientServiceImpl implements ClientService {
 
     private Client getClientOrThrow(Long id) {
         return clientRepository.findById(id)
-                .orElseThrow(() -> new SubjectNotFoundException(id));
+                .orElseThrow(() -> new ResourceNotFoundException(id));
     }
 }

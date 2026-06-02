@@ -27,7 +27,6 @@ public class ClientController {
      */
     @PostMapping
     public ResponseEntity<ClientResponse> create(@Valid @RequestBody CreateClientRequest request) {
-        log.info("POST /api/clients — creating client '{}'", request.getFullName());
         ClientResponse response = clientService.create(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }

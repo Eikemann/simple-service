@@ -3,7 +3,7 @@ package com.company.simpleservice.services.impl;
 import com.company.simpleservice.dto.request.Hotel.CreateHotelRequest;
 import com.company.simpleservice.dto.request.Hotel.UpdateHotelRequest;
 import com.company.simpleservice.dto.response.HotelResponse;
-import com.company.simpleservice.exceptions.SubjectNotFoundException;
+import com.company.simpleservice.exceptions.ResourceNotFoundException;
 import com.company.simpleservice.mapper.HotelMapper;
 import com.company.simpleservice.models.Hotel;
 import com.company.simpleservice.repository.HotelRepository;
@@ -25,13 +25,13 @@ class HotelServiceImpl implements HotelService {
     @Override
     public void create(CreateHotelRequest request) {
         Hotel hotel = Hotel.builder()
-                .name(request.getName())
-                .address(request.getAddress())
-                .city(request.getCity())
-                .country(request.getCountry())
-                .phone(request.getPhone())
-                .email(request.getEmail())
-                .starRating(request.getStarRating())
+                .name(request.name())
+                .address(request.address())
+                .city(request.city())
+                .country(request.country())
+                .phone(request.phone())
+                .email(request.email())
+                .starRating(request.starRating())
                 .build();
         hotelRepository.save(hotel);
     }
@@ -39,13 +39,13 @@ class HotelServiceImpl implements HotelService {
     @Override
     public void update(Long id, UpdateHotelRequest request) {
         Hotel hotel = getHotelOrThrow(id);
-        hotel.setName(request.getName());
-        hotel.setAddress(request.getAddress());
-        hotel.setCity(request.getCity());
-        hotel.setCountry(request.getCountry());
-        hotel.setPhone(request.getPhone());
-        hotel.setEmail(request.getEmail());
-        hotel.setStarRating(request.getStarRating());
+        hotel.setName(request.name());
+        hotel.setAddress(request.address());
+        hotel.setCity(request.city());
+        hotel.setCountry(request.country());
+        hotel.setPhone(request.phone());
+        hotel.setEmail(request.email());
+        hotel.setStarRating(request.starRating());
         hotelRepository.save(hotel);
     }
 
@@ -68,6 +68,6 @@ class HotelServiceImpl implements HotelService {
 
     Hotel getHotelOrThrow(Long id) {
         return hotelRepository.findById(id)
-                .orElseThrow(() -> new SubjectNotFoundException(id));
+                .orElseThrow(() -> new ResourceNotFoundException(id));
     }
 }

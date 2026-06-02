@@ -3,7 +3,7 @@ package com.company.simpleservice.services.impl;
 import com.company.simpleservice.dto.request.Room.CreateRoomRequest;
 import com.company.simpleservice.dto.request.Room.UpdateRoomRequest;
 import com.company.simpleservice.dto.response.RoomResponse;
-import com.company.simpleservice.exceptions.SubjectNotFoundException;
+import com.company.simpleservice.exceptions.ResourceNotFoundException;
 import com.company.simpleservice.mapper.RoomMapper;
 import com.company.simpleservice.models.Hotel;
 import com.company.simpleservice.models.Room;
@@ -27,15 +27,15 @@ class RoomServiceImpl implements RoomService {
 
     @Override
     public void create(CreateRoomRequest request) {
-        Hotel hotel = hotelRepository.findById(request.getHotelId())
-                .orElseThrow(() -> new SubjectNotFoundException(request.getHotelId()));
+        Hotel hotel = hotelRepository.findById(request.hotelId())
+                .orElseThrow(() -> new ResourceNotFoundException(request.hotelId()));
         Room room = Room.builder()
                 .hotel(hotel)
-                .roomNumber(request.getRoomNumber())
-                .roomType(request.getRoomType())
-                .capacity(request.getCapacity())
-                .pricePerNight(request.getPricePerNight())
-                .status(request.getStatus())
+                .roomNumber(request.roomNumber())
+                .roomType(request.roomType())
+                .capacity(request.capacity())
+                .pricePerNight(request.pricePerNight())
+                .status(request.status())
                 .build();
         roomRepository.save(room);
     }
@@ -43,11 +43,11 @@ class RoomServiceImpl implements RoomService {
     @Override
     public void update(Long id, UpdateRoomRequest request) {
         Room room = getRoomOrThrow(id);
-        room.setRoomNumber(request.getRoomNumber());
-        room.setRoomType(request.getRoomType());
-        room.setCapacity(request.getCapacity());
-        room.setPricePerNight(request.getPricePerNight());
-        room.setStatus(request.getStatus());
+        room.setRoomNumber(request.roomNumber());
+        room.setRoomType(request.roomType());
+        room.setCapacity(request.capacity());
+        room.setPricePerNight(request.pricePerNight());
+        room.setStatus(request.status());
         roomRepository.save(room);
     }
 
@@ -78,6 +78,6 @@ class RoomServiceImpl implements RoomService {
 
     private Room getRoomOrThrow(Long id) {
         return roomRepository.findById(id)
-                .orElseThrow(() -> new SubjectNotFoundException(id));
+                .orElseThrow(() -> new ResourceNotFoundException(id));
     }
 }

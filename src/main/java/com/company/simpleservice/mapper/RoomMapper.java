@@ -7,14 +7,14 @@ import org.springframework.stereotype.Component;
 @Component
 public class RoomMapper {
     public RoomResponse toResponse(Room room) {
-        return RoomResponse.builder()
-                .id(room.getId())
-                .hotelId(room.getHotel().getId())
-                .roomNumber(room.getRoomNumber())
-                .roomType(room.getRoomType())
-                .capacity(room.getCapacity())
-                .pricePerNight(room.getPricePerNight())
-                .status(room.getStatus())
-                .build();
+        return new RoomResponse(
+                room.getId(),
+                room.getHotel().getId(),
+                room.getRoomNumber(),
+                room.getRoomType(),
+                room.getCapacity(),
+                room.getPricePerNight(),
+                room.getStatus()
+        );
     }
 }
