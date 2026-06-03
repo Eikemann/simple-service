@@ -9,10 +9,12 @@ public class OrderMapper {
     public OrderResponse toResponse(Order order) {
         return new OrderResponse(
                 order.getId(),
-                order.getHotel().getId(),
+                order.getProperty().getId(),
+                order.getProperty().getName(),
                 order.getRoom().getId(),
-                order.getGuestName(),
-                order.getGuestEmail(),
+                order.getRoom().getRoomNumber(),
+                order.getUser().getId(),
+                order.getUser().getFullName(),
                 order.getCheckInDate(),
                 order.getCheckOutDate(),
                 order.getTotalAmount(),

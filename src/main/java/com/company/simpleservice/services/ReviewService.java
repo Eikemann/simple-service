@@ -12,5 +12,5 @@ public interface ReviewService {
     void delete(Long id);
     List<ReviewResponse> findAll();
     ReviewResponse findById(Long id);
-    List<ReviewResponse> findByHotelId(Long hotelId);
+    List<ReviewResponse> findByPropertyId(Long propertyId);
 }

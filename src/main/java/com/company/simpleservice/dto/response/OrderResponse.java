@@ -8,10 +8,12 @@ import java.time.LocalDateTime;
 
 public record OrderResponse(
         Long id,
-        Long hotelId,
+        Long propertyId,
+        String propertyName,
         Long roomId,
-        String guestName,
-        String guestEmail,
+        String roomNumber,
+        Long userId,
+        String userFullName,
         LocalDate checkInDate,
         LocalDate checkOutDate,
         BigDecimal totalAmount,

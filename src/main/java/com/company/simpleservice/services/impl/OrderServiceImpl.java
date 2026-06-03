@@ -5,17 +5,19 @@ import com.company.simpleservice.dto.request.Order.UpdateOrderRequest;
 import com.company.simpleservice.dto.response.OrderResponse;
 import com.company.simpleservice.exceptions.ResourceNotFoundException;
 import com.company.simpleservice.mapper.OrderMapper;
-import com.company.simpleservice.models.Hotel;
-import com.company.simpleservice.models.Order;
-import com.company.simpleservice.models.Room;
-import com.company.simpleservice.repository.HotelRepository;
+import com.company.simpleservice.models.*;
 import com.company.simpleservice.repository.OrderRepository;
+import com.company.simpleservice.repository.PropertyRepository;
 import com.company.simpleservice.repository.RoomRepository;
+import com.company.simpleservice.repository.UserRepository;
 import com.company.simpleservice.services.OrderService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 @Service
@@ -24,48 +26,47 @@ import java.util.List;
 class OrderServiceImpl implements OrderService {
 
     private final OrderRepository orderRepository;
-    private final HotelRepository hotelRepository;
+    private final PropertyRepository propertyRepository;
     private final RoomRepository roomRepository;
+    private final UserRepository userRepository;
     private final OrderMapper orderMapper;
 
     @Override
     public void create(CreateOrderRequest request) {
-        Hotel hotel = hotelRepository.findById(request.hotelId())
-                .orElseThrow(() -> new ResourceNotFoundException(request.hotelId()));
-        Room room = roomRepository.findById(request.roomId())
-                .orElseThrow(() -> new ResourceNotFoundException(request.roomId()));
-
-        if (!room.getHotel().getId().equals(hotel.getId())) {
-            throw new IllegalArgumentException("Room does not belong to the specified hotel");
-        }
         if (!request.checkOutDate().isAfter(request.checkInDate())) {
             throw new IllegalArgumentException("checkOutDate must be after checkInDate");
         }
 
+        Property property = propertyRepository.findById(request.propertyId())
+                .orElseThrow(() -> new ResourceNotFoundException(request.propertyId()));
+        Room room = roomRepository.findById(request.roomId())
+                .orElseThrow(() -> new ResourceNotFoundException(request.roomId()));
+
+        if (!room.getProperty().getId().equals(property.getId())) {
+            throw new IllegalArgumentException("Room does not belong to the specified property");
+        }
+        if (orderRepository.isRoomBooked(room.getId(), request.checkInDate(), request.checkOutDate(), OrderStatus.CANCELLED)) {
+            throw new IllegalArgumentException("Room is not available for the selected dates");
+        }
+
+        long nights = ChronoUnit.DAYS.between(request.checkInDate(), request.checkOutDate());
+        BigDecimal totalAmount = room.getPricePerNight().multiply(BigDecimal.valueOf(nights));
+
         Order order = Order.builder()
-                .hotel(hotel)
+                .property(property)
                 .room(room)
-                .guestName(request.guestName())
-                .guestEmail(request.guestEmail())
+                .user(currentUser())
                 .checkInDate(request.checkInDate())
                 .checkOutDate(request.checkOutDate())
-                .totalAmount(request.totalAmount())
-                .orderStatus(request.orderStatus())
+                .totalAmount(totalAmount)
+                .orderStatus(OrderStatus.PENDING)
                 .build();
         orderRepository.save(order);
     }
 
     @Override
     public void update(Long id, UpdateOrderRequest request) {
-        if (!request.checkOutDate().isAfter(request.checkInDate())) {
-            throw new IllegalArgumentException("checkOutDate must be after checkInDate");
-        }
         Order order = getOrderOrThrow(id);
-        order.setGuestName(request.guestName());
-        order.setGuestEmail(request.guestEmail());
-        order.setCheckInDate(request.checkInDate());
-        order.setCheckOutDate(request.checkOutDate());
-        order.setTotalAmount(request.totalAmount());
         order.setOrderStatus(request.orderStatus());
         orderRepository.save(order);
     }
@@ -90,8 +91,8 @@ class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<OrderResponse> findByHotelId(Long hotelId) {
-        return orderRepository.findByHotelId(hotelId)
+    public List<OrderResponse> findByPropertyId(Long propertyId) {
+        return orderRepository.findByPropertyId(propertyId)
                 .stream().map(orderMapper::toResponse).toList();
     }
 
@@ -100,6 +101,19 @@ class OrderServiceImpl implements OrderService {
     public List<OrderResponse> findByRoomId(Long roomId) {
         return orderRepository.findByRoomId(roomId)
                 .stream().map(orderMapper::toResponse).toList();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<OrderResponse> findMyOrders() {
+        return orderRepository.findByUserId(currentUser().getId())
+                .stream().map(orderMapper::toResponse).toList();
+    }
+
+    private User currentUser() {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException(0L));
     }
 
     private Order getOrderOrThrow(Long id) {

@@ -4,10 +4,11 @@ import java.time.LocalDateTime;
 
 public record ReviewResponse(
         Long id,
-        Long hotelId,
+        Long propertyId,
+        Long userId,
+        String userFullName,
         Integer rating,
         String title,
         String comment,
-        String reviewerName,
         LocalDateTime createdAt
 ) {}

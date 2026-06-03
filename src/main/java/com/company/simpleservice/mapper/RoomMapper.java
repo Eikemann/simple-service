@@ -9,7 +9,7 @@ public class RoomMapper {
     public RoomResponse toResponse(Room room) {
         return new RoomResponse(
                 room.getId(),
-                room.getHotel().getId(),
+                room.getProperty().getId(),
                 room.getRoomNumber(),
                 room.getRoomType(),
                 room.getCapacity(),

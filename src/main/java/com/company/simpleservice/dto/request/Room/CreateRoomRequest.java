@@ -7,7 +7,7 @@ import jakarta.validation.constraints.*;
 import java.math.BigDecimal;
 
 public record CreateRoomRequest(
-        @NotNull(message = "hotelId is required") Long hotelId,
+        @NotNull(message = "propertyId is required") Long propertyId,
         @NotBlank(message = "roomNumber is required") String roomNumber,
         @NotNull(message = "roomType is required") RoomType roomType,
         @NotNull(message = "capacity is required") @Min(1) Integer capacity,

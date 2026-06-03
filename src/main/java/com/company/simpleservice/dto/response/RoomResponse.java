@@ -7,7 +7,7 @@ import java.math.BigDecimal;
 
 public record RoomResponse(
         Long id,
-        Long hotelId,
+        Long propertyId,
         String roomNumber,
         RoomType roomType,
         Integer capacity,
