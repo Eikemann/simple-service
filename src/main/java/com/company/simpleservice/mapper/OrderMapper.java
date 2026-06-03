@@ -11,6 +11,7 @@ public class OrderMapper {
                 order.getId(),
                 order.getProperty().getId(),
                 order.getProperty().getName(),
+                order.getProperty().getImageUrl(),
                 order.getRoom().getId(),
                 order.getRoom().getRoomNumber(),
                 order.getUser().getId(),

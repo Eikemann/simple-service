@@ -10,6 +10,7 @@ public record OrderResponse(
         Long id,
         Long propertyId,
         String propertyName,
+        String propertyImageUrl,
         Long roomId,
         String roomNumber,
         Long userId,
