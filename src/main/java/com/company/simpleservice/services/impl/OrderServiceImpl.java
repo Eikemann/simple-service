@@ -12,6 +12,7 @@ import com.company.simpleservice.repository.RoomRepository;
 import com.company.simpleservice.repository.UserRepository;
 import com.company.simpleservice.services.OrderService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -73,7 +74,12 @@ class OrderServiceImpl implements OrderService {
 
     @Override
     public void delete(Long id) {
-        orderRepository.delete(getOrderOrThrow(id));
+        Order order = getOrderOrThrow(id);
+        User current = currentUser();
+        if (current.getRole() != Role.ADMIN && !order.getUser().getId().equals(current.getId())) {
+            throw new AccessDeniedException("You can only delete your own bookings");
+        }
+        orderRepository.delete(order);
     }
 
     @Override
