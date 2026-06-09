@@ -9,7 +9,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
-import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
 @Component
@@ -48,15 +47,6 @@ public class JwtUtil {
     }
 
     private SecretKey signingKey() {
-        String value = secret == null ? "" : secret.trim();
-        byte[] keyBytes;
-        try {
-            // Preferred: a Base64-encoded secret.
-            keyBytes = Decoders.BASE64.decode(value);
-        } catch (RuntimeException ex) {
-            // Fallback: treat the value as a raw passphrase (handles spaces, etc.).
-            keyBytes = value.getBytes(StandardCharsets.UTF_8);
-        }
-        return Keys.hmacShaKeyFor(keyBytes);
+        return Keys.hmacShaKeyFor(Decoders.BASE64.decode(secret));
     }
 }
