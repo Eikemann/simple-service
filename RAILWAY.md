@@ -18,10 +18,11 @@ and `railway.json` tells Railway to use it, with a health check on
 | `JPA_DDL_AUTO` | no | Default `update`. Use `validate` once schema is stable. |
 | `JPA_SHOW_SQL` | no | Set `false` in prod for quieter logs. |
 
-Generate a JWT secret:
+Generate a JWT secret (no spaces or line breaks — paste it as a single line):
 ```bash
-openssl rand -base64 48
+openssl rand -base64 48 | tr -d '\n'
 ```
+The app also accepts a plain passphrase (≥ 32 characters) if it isn't valid Base64.
 
 ## Deploy via the Railway dashboard
 
