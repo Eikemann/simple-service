@@ -3,8 +3,9 @@ package com.company.simpleservice.models;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.math.BigDecimal;
-import java.util.List;
+import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity @Table(name = "properties")
 @Getter @Setter
@@ -19,27 +20,48 @@ public class Property {
     @Column(name = "name", nullable = false)
     private String name;
 
-    @ElementCollection
-    @CollectionTable(
-            name = "property_amenities",
-            joinColumns = @JoinColumn(name = "property_id")
-    )
-    @Column(name = "amenity")
-    private List<String> amenities;
+    @Column(name = "address", nullable = false)
+    private String address;
+
+    @Column(name = "city", nullable = false)
+    private String city;
+
+    @Column(name = "country", nullable = false)
+    private String country;
+
+    @Column(name = "phone")
+    private String phone;
+
+    @Column(name = "email")
+    private String email;
 
     @Column(name = "description", columnDefinition = "TEXT")
     private String description;
+
+    @Column(name = "image_url")
+    private String imageUrl;
+
+    @Column(name = "star_rating")
+    private Integer starRating;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "property_type", nullable = false)
     private PropertyType propertyType;
 
-    @Column(name = "location_rating")
-    private Double locationRating;
+    @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinTable(
+            name = "property_amenities",
+            joinColumns = @JoinColumn(name = "property_id"),
+            inverseJoinColumns = @JoinColumn(name = "amenity_id")
+    )
+    @Builder.Default
+    private Set<Amenity> amenities = new HashSet<>();
 
-    @Column(name = "reviews_count")
-    private Long reviewsCount;
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private LocalDateTime createdAt;
 
-    @Column(name = "rate_per_night", nullable = false)
-    private BigDecimal ratePerNight;
+    @PrePersist
+    private void prePersist() {
+        createdAt = LocalDateTime.now();
+    }
 }

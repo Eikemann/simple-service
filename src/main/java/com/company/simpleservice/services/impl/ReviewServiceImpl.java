@@ -3,14 +3,17 @@ package com.company.simpleservice.services.impl;
 import com.company.simpleservice.dto.request.Review.CreateReviewRequest;
 import com.company.simpleservice.dto.request.Review.UpdateReviewRequest;
 import com.company.simpleservice.dto.response.ReviewResponse;
-import com.company.simpleservice.exceptions.SubjectNotFoundException;
+import com.company.simpleservice.exceptions.ResourceNotFoundException;
 import com.company.simpleservice.mapper.ReviewMapper;
-import com.company.simpleservice.models.Hotel;
+import com.company.simpleservice.models.Property;
 import com.company.simpleservice.models.Review;
-import com.company.simpleservice.repository.HotelRepository;
+import com.company.simpleservice.models.User;
+import com.company.simpleservice.repository.PropertyRepository;
 import com.company.simpleservice.repository.ReviewRepository;
+import com.company.simpleservice.repository.UserRepository;
 import com.company.simpleservice.services.ReviewService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,19 +25,20 @@ import java.util.List;
 class ReviewServiceImpl implements ReviewService {
 
     private final ReviewRepository reviewRepository;
-    private final HotelRepository hotelRepository;
+    private final PropertyRepository propertyRepository;
+    private final UserRepository userRepository;
     private final ReviewMapper reviewMapper;
 
     @Override
     public void create(CreateReviewRequest request) {
-        Hotel hotel = hotelRepository.findById(request.getHotelId())
-                .orElseThrow(() -> new SubjectNotFoundException(request.getHotelId()));
+        Property property = propertyRepository.findById(request.propertyId())
+                .orElseThrow(() -> new ResourceNotFoundException(request.propertyId()));
         Review review = Review.builder()
-                .hotel(hotel)
-                .rating(request.getRating())
-                .title(request.getTitle())
-                .comment(request.getComment())
-                .reviewerName(request.getReviewerName())
+                .property(property)
+                .user(currentUser())
+                .rating(request.rating())
+                .title(request.title())
+                .comment(request.comment())
                 .build();
         reviewRepository.save(review);
     }
@@ -42,10 +46,9 @@ class ReviewServiceImpl implements ReviewService {
     @Override
     public void update(Long id, UpdateReviewRequest request) {
         Review review = getReviewOrThrow(id);
-        review.setRating(request.getRating());
-        review.setTitle(request.getTitle());
-        review.setComment(request.getComment());
-        review.setReviewerName(request.getReviewerName());
+        review.setRating(request.rating());
+        review.setTitle(request.title());
+        review.setComment(request.comment());
         reviewRepository.save(review);
     }
 
@@ -69,13 +72,19 @@ class ReviewServiceImpl implements ReviewService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<ReviewResponse> findByHotelId(Long hotelId) {
-        return reviewRepository.findByHotelId(hotelId)
+    public List<ReviewResponse> findByPropertyId(Long propertyId) {
+        return reviewRepository.findByPropertyId(propertyId)
                 .stream().map(reviewMapper::toResponse).toList();
+    }
+
+    private User currentUser() {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException(0L));
     }
 
     private Review getReviewOrThrow(Long id) {
         return reviewRepository.findById(id)
-                .orElseThrow(() -> new SubjectNotFoundException(id));
+                .orElseThrow(() -> new ResourceNotFoundException(id));
     }
 }

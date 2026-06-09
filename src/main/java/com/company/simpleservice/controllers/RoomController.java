@@ -37,9 +37,9 @@ public class RoomController {
         return roomService.findById(id);
     }
 
-    @GetMapping("/hotel/{hotelId}")
-    public List<RoomResponse> findByHotelId(@PathVariable long hotelId) {
-        return roomService.findByHotelId(hotelId);
+    @GetMapping("/property/{propertyId}")
+    public List<RoomResponse> findByPropertyId(@PathVariable long propertyId) {
+        return roomService.findByPropertyId(propertyId);
     }
 
     @PutMapping("/{id}")

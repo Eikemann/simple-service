@@ -7,14 +7,15 @@ import org.springframework.stereotype.Component;
 @Component
 public class ReviewMapper {
     public ReviewResponse toResponse(Review review) {
-        return ReviewResponse.builder()
-                .id(review.getId())
-                .hotelId(review.getHotel().getId())
-                .rating(review.getRating())
-                .title(review.getTitle())
-                .comment(review.getComment())
-                .reviewerName(review.getReviewerName())
-                .createdAt(review.getCreatedAt())
-                .build();
+        return new ReviewResponse(
+                review.getId(),
+                review.getProperty().getId(),
+                review.getUser().getId(),
+                review.getUser().getFullName(),
+                review.getRating(),
+                review.getTitle(),
+                review.getComment(),
+                review.getCreatedAt()
+        );
     }
 }

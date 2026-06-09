@@ -1,6 +1,6 @@
 package com.company.simpleservice.models;
 
-public enum Gender {
-    MALE,
-    FEMALE
+public enum Role {
+    GUEST,
+    ADMIN
 }

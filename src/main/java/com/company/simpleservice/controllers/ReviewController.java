@@ -37,9 +37,9 @@ public class ReviewController {
         return reviewService.findById(id);
     }
 
-    @GetMapping("/hotel/{hotelId}")
-    public List<ReviewResponse> findByHotelId(@PathVariable long hotelId) {
-        return reviewService.findByHotelId(hotelId);
+    @GetMapping("/property/{propertyId}")
+    public List<ReviewResponse> findByPropertyId(@PathVariable long propertyId) {
+        return reviewService.findByPropertyId(propertyId);
     }
 
     @PutMapping("/{id}")

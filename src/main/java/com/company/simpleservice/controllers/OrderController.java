@@ -32,14 +32,19 @@ public class OrderController {
         return orderService.findAll();
     }
 
+    @GetMapping("/my")
+    public List<OrderResponse> findMyOrders() {
+        return orderService.findMyOrders();
+    }
+
     @GetMapping("/{id}")
     public OrderResponse findById(@PathVariable long id) {
         return orderService.findById(id);
     }
 
-    @GetMapping("/hotel/{hotelId}")
-    public List<OrderResponse> findByHotelId(@PathVariable long hotelId) {
-        return orderService.findByHotelId(hotelId);
+    @GetMapping("/property/{propertyId}")
+    public List<OrderResponse> findByPropertyId(@PathVariable long propertyId) {
+        return orderService.findByPropertyId(propertyId);
     }
 
     @GetMapping("/room/{roomId}")

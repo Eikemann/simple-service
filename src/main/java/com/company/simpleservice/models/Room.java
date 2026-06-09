@@ -16,8 +16,8 @@ public class Room {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "hotel_id", nullable = false)
-    private Hotel hotel;
+    @JoinColumn(name = "property_id", nullable = false)
+    private Property property;
 
     @Column(name = "room_number", nullable = false)
     private String roomNumber;

@@ -12,6 +12,7 @@ public interface OrderService {
     void delete(Long id);
     List<OrderResponse> findAll();
     OrderResponse findById(Long id);
-    List<OrderResponse> findByHotelId(Long hotelId);
+    List<OrderResponse> findByPropertyId(Long propertyId);
     List<OrderResponse> findByRoomId(Long roomId);
+    List<OrderResponse> findMyOrders();
 }
