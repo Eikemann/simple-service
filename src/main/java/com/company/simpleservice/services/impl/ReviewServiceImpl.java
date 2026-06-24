@@ -7,12 +7,14 @@ import com.company.simpleservice.exceptions.ResourceNotFoundException;
 import com.company.simpleservice.mapper.ReviewMapper;
 import com.company.simpleservice.models.Property;
 import com.company.simpleservice.models.Review;
+import com.company.simpleservice.models.Role;
 import com.company.simpleservice.models.User;
 import com.company.simpleservice.repository.PropertyRepository;
 import com.company.simpleservice.repository.ReviewRepository;
 import com.company.simpleservice.repository.UserRepository;
 import com.company.simpleservice.services.ReviewService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -46,6 +48,10 @@ class ReviewServiceImpl implements ReviewService {
     @Override
     public void update(Long id, UpdateReviewRequest request) {
         Review review = getReviewOrThrow(id);
+        User current = currentUser();
+        if (current.getRole() != Role.ADMIN && !review.getUser().getId().equals(current.getId())) {
+            throw new AccessDeniedException("You can only edit your own reviews");
+        }
         review.setRating(request.rating());
         review.setTitle(request.title());
         review.setComment(request.comment());
@@ -54,7 +60,12 @@ class ReviewServiceImpl implements ReviewService {
 
     @Override
     public void delete(Long id) {
-        reviewRepository.delete(getReviewOrThrow(id));
+        Review review = getReviewOrThrow(id);
+        User current = currentUser();
+        if (current.getRole() != Role.ADMIN && !review.getUser().getId().equals(current.getId())) {
+            throw new AccessDeniedException("You can only delete your own reviews");
+        }
+        reviewRepository.delete(review);
     }
 
     @Override

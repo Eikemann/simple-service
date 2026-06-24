@@ -31,7 +31,9 @@ services:
       SPRING_DATASOURCE_PASSWORD: postgres
       JPA_DDL_AUTO: update
     ports:
-      - "8080:8080"
+      # Host 8081 → container 8080. Host 8080 is held by a stale WSL portproxy rule
+      # (IP Helper), so we publish on 8081 to avoid the clash.
+      - "8081:8080"
     restart: unless-stopped
 
 volumes:
