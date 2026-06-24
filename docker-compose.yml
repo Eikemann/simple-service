@@ -1,0 +1,40 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: hotelapp_postgres
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: hotelapp_backend
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      # Point Spring at the postgres service on the compose network (not localhost).
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/postgres
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      JPA_DDL_AUTO: update
+    ports:
+      # Host 8081 → container 8080. Host 8080 is held by a stale WSL portproxy rule
+      # (IP Helper), so we publish on 8081 to avoid the clash.
+      - "8081:8080"
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
